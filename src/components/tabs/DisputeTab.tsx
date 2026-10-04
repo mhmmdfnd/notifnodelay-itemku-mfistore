@@ -70,45 +70,51 @@ export const DisputeTab: React.FC<DisputeTabProps> = ({
           </h3>
 
           <div className="space-y-2">
-            {disputes.map((d) => {
-              const isSelected = d.id === selectedCase?.id;
-              const isResolved = resolvedIds.has(d.id);
+            {disputes.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-xs">
+                Tidak ada komplain atau kendala pesanan aktif. Lapak Anda aman!
+              </div>
+            ) : (
+              disputes.map((d) => {
+                const isSelected = d.id === selectedCase?.id;
+                const isResolved = resolvedIds.has(d.id);
 
-              return (
-                <button
-                  key={d.id}
-                  onClick={() => setSelectedCaseId(d.id)}
-                  className={`w-full p-4 rounded-xl text-left border transition ${
-                    isSelected 
-                      ? 'bg-red-950/30 border-red-800/80 shadow-md' 
-                      : 'bg-slate-950 border-slate-800 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="font-mono text-xs font-bold text-white">{d.order_number}</span>
-                    <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
-                      isResolved 
-                        ? 'bg-emerald-500/20 text-emerald-300' 
-                        : 'bg-red-500/20 text-red-300 animate-pulse'
-                    }`}>
-                      {isResolved ? 'Selesai' : `${d.sla_hours_left} Jam Tersisa`}
-                    </span>
-                  </div>
+                return (
+                  <button
+                    key={d.id}
+                    onClick={() => setSelectedCaseId(d.id)}
+                    className={`w-full p-4 rounded-xl text-left border transition ${
+                      isSelected 
+                        ? 'bg-red-950/30 border-red-800/80 shadow-md' 
+                        : 'bg-slate-950 border-slate-800 hover:border-slate-700'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="font-mono text-xs font-bold text-white">{d.order_number}</span>
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full ${
+                        isResolved 
+                          ? 'bg-emerald-500/20 text-emerald-300' 
+                          : 'bg-red-500/20 text-red-300 animate-pulse'
+                      }`}>
+                        {isResolved ? 'Selesai' : `${d.sla_hours_left} Jam Tersisa`}
+                      </span>
+                    </div>
 
-                  <div className="text-xs font-semibold text-slate-200">{d.buyer_name}</div>
-                  <div className="text-[11px] text-slate-400">{d.product_name}</div>
+                    <div className="text-xs font-semibold text-slate-200">{d.buyer_name}</div>
+                    <div className="text-[11px] text-slate-400">{d.product_name}</div>
 
-                  <p className="mt-2 text-xs text-red-300/90 line-clamp-2 italic bg-red-950/40 p-2 rounded-lg border border-red-900/40">
-                    "{d.reason}"
-                  </p>
-                </button>
-              );
-            })}
+                    <p className="mt-2 text-xs text-red-300/90 line-clamp-2 italic bg-red-950/40 p-2 rounded-lg border border-red-900/40">
+                      "{d.reason}"
+                    </p>
+                  </button>
+                );
+              })
+            )}
           </div>
         </div>
 
         {/* Selected Case Detail & Action Panel (7 cols) */}
-        <div className="md:col-span-7 rounded-2xl bg-[#0d1424] border border-slate-800 p-5 space-y-4">
+        <div className="md:col-span-7 rounded-2xl bg-[#0d1424] border border-slate-800 p-5 space-y-4 flex flex-col justify-center">
           {selectedCase ? (
             <>
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -170,8 +176,12 @@ export const DisputeTab: React.FC<DisputeTabProps> = ({
               </div>
             </>
           ) : (
-            <div className="p-12 text-center text-slate-500 text-xs">
-              Pilih kasus di sebelah kiri untuk melihat detailnya.
+            <div className="p-12 text-center text-slate-500 text-xs my-auto">
+              <div className="flex flex-col items-center justify-center gap-2 max-w-xs mx-auto">
+                <CheckCircle2 className="w-8 h-8 text-emerald-500" />
+                <p className="font-semibold text-white">Semua Transaksi Normal</p>
+                <p className="text-slate-400 text-xs">Tidak ada komplain pembeli yang membutuhkan respon saat ini.</p>
+              </div>
             </div>
           )}
         </div>

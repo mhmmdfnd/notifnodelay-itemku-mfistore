@@ -22,14 +22,14 @@ interface OrderManagementTabProps {
   orders: TokokuOrder[];
   onDeliverOrder: (orderId: number, deliveryInfo?: any) => Promise<boolean>;
   onRejectOrder: (orderId: number, refundReason: RefundReason) => Promise<boolean>;
-  onSimulateOrder: () => void;
+  onClearOrders?: () => void;
 }
 
 export const OrderManagementTab: React.FC<OrderManagementTabProps> = ({
   orders,
   onDeliverOrder,
   onRejectOrder,
-  onSimulateOrder,
+  onClearOrders,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<TokokuOrder | null>(null);
@@ -202,15 +202,16 @@ export const OrderManagementTab: React.FC<OrderManagementTabProps> = ({
               />
             </div>
 
-            {/* Sandbox Generator Button */}
-            <button
-              onClick={onSimulateOrder}
-              title="Simulasikan Order Masuk via Tokoku Sandbox API"
-              className="px-3 py-2 rounded-xl bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 border border-teal-500/30 text-xs font-semibold flex items-center gap-1.5 shrink-0 transition"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">+ Simulasi Order (Sandbox)</span>
-            </button>
+            {/* Optional Clear History Button */}
+            {orders.length > 0 && onClearOrders && (
+              <button
+                onClick={onClearOrders}
+                title="Bersihkan riwayat pesanan lokal"
+                className="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-800 text-xs font-medium shrink-0 transition"
+              >
+                Bersihkan Riwayat
+              </button>
+            )}
           </div>
         </div>
 
@@ -230,8 +231,18 @@ export const OrderManagementTab: React.FC<OrderManagementTabProps> = ({
             <tbody className="divide-y divide-slate-800/60 font-sans">
               {filteredOrders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-slate-500 text-xs">
-                    Tidak ada pesanan yang sesuai dengan pencarian Anda.
+                  <td colSpan={6} className="py-16 text-center text-slate-400 text-xs">
+                    <div className="flex flex-col items-center justify-center gap-3 max-w-md mx-auto">
+                      <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400">
+                        <ShoppingBag className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-white text-sm">Belum Ada Pesanan Masuk</p>
+                        <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+                          Sistem aktif standby menunggu pesanan baru dari Tokoku Itemku via Webhook &amp; Poller. Notifikasi WhatsApp &amp; Telegram serta suara alarm akan berbunyi seketika saat pembeli membayar.
+                        </p>
+                      </div>
+                    </div>
                   </td>
                 </tr>
               ) : (

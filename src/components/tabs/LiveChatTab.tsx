@@ -93,33 +93,39 @@ export const LiveChatTab: React.FC<LiveChatTabProps> = ({
 
           {/* List items */}
           <div className="flex-1 overflow-y-auto divide-y divide-slate-800/60">
-            {filteredChats.map((c) => {
-              const isSelected = c.id === selectedChatId;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => handleSelectChat(c)}
-                  className={`w-full p-3.5 text-left transition flex items-start gap-3 ${
-                    isSelected ? 'bg-slate-900 border-l-2 border-teal-400' : 'hover:bg-slate-900/40'
-                  }`}
-                >
-                  <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 text-slate-300 font-bold text-xs">
-                    {c.buyer_name.charAt(0)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-white truncate">{c.buyer_name}</h4>
-                      <span className="text-[10px] text-slate-500 font-mono">{c.timestamp}</span>
+            {filteredChats.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-xs">
+                Belum ada pesan chat dari pembeli.
+              </div>
+            ) : (
+              filteredChats.map((c) => {
+                const isSelected = c.id === selectedChatId;
+                return (
+                  <button
+                    key={c.id}
+                    onClick={() => handleSelectChat(c)}
+                    className={`w-full p-3.5 text-left transition flex items-start gap-3 ${
+                      isSelected ? 'bg-slate-900 border-l-2 border-teal-400' : 'hover:bg-slate-900/40'
+                    }`}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 text-slate-300 font-bold text-xs">
+                      {c.buyer_name.charAt(0)}
                     </div>
-                    <p className="text-[11px] text-teal-300 truncate mt-0.5">{c.product_name}</p>
-                    <p className="text-xs text-slate-400 truncate mt-1">{c.last_message}</p>
-                  </div>
-                  {c.unread && (
-                    <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 mt-1"></span>
-                  )}
-                </button>
-              );
-            })}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-bold text-white truncate">{c.buyer_name}</h4>
+                        <span className="text-[10px] text-slate-500 font-mono">{c.timestamp}</span>
+                      </div>
+                      <p className="text-[11px] text-teal-300 truncate mt-0.5">{c.product_name}</p>
+                      <p className="text-xs text-slate-400 truncate mt-1">{c.last_message}</p>
+                    </div>
+                    {c.unread && (
+                      <span className="w-2 h-2 rounded-full bg-red-500 shrink-0 mt-1"></span>
+                    )}
+                  </button>
+                );
+              })
+            )}
           </div>
 
         </div>

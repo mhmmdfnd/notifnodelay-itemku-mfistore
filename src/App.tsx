@@ -26,35 +26,38 @@ export default function App() {
   // Navigation
   const [activeMenu, setActiveMenu] = useState<string>('orders');
 
-  // State with LocalStorage
+  // State with LocalStorage (Initialized clean, no mock orders)
   const [orders, setOrders] = useState<TokokuOrder[]>(() => {
     try {
-      const saved = localStorage.getItem('tokoku_orders_v2');
+      localStorage.removeItem('tokoku_orders_v2'); // Clean old mock orders
+      const saved = localStorage.getItem('tokoku_orders_live');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.warn('Orders load error:', e);
     }
-    return INITIAL_ORDERS;
+    return [];
   });
 
   const [chats, setChats] = useState<BuyerChat[]>(() => {
     try {
-      const saved = localStorage.getItem('tokoku_chats_v2');
+      localStorage.removeItem('tokoku_chats_v2'); // Clean old mock chats
+      const saved = localStorage.getItem('tokoku_chats_live');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.warn('Chats load error:', e);
     }
-    return INITIAL_CHATS;
+    return [];
   });
 
   const [disputes, setDisputes] = useState<OrderDispute[]>(() => {
     try {
-      const saved = localStorage.getItem('tokoku_disputes_v2');
+      localStorage.removeItem('tokoku_disputes_v2'); // Clean old mock disputes
+      const saved = localStorage.getItem('tokoku_disputes_live');
       if (saved) return JSON.parse(saved);
     } catch (e) {
       console.warn('Disputes load error:', e);
     }
-    return INITIAL_DISPUTES;
+    return [];
   });
 
   const [config, setConfig] = useState<SellerConfig>(() => {
@@ -74,7 +77,7 @@ export default function App() {
   // Save changes
   useEffect(() => {
     try {
-      localStorage.setItem('tokoku_orders_v2', JSON.stringify(orders));
+      localStorage.setItem('tokoku_orders_live', JSON.stringify(orders));
     } catch (e) {
       console.warn('Save orders error:', e);
     }
@@ -82,7 +85,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('tokoku_chats_v2', JSON.stringify(chats));
+      localStorage.setItem('tokoku_chats_live', JSON.stringify(chats));
     } catch (e) {
       console.warn('Save chats error:', e);
     }
@@ -90,7 +93,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      localStorage.setItem('tokoku_disputes_v2', JSON.stringify(disputes));
+      localStorage.setItem('tokoku_disputes_live', JSON.stringify(disputes));
     } catch (e) {
       console.warn('Save disputes error:', e);
     }
@@ -215,82 +218,6 @@ export default function App() {
     }
   };
 
-  // Simulate new incoming order via Sandbox API
-  const handleSimulateOrder = () => {
-    const randomNum = Math.floor(100000 + Math.random() * 900000);
-    const orderNumber = `OD00000${randomNum}`;
-    const orderId = randomNum;
-
-    const sampleVariants: { game: string; prod: string; price: number; income: number; req: Record<string, string>; buyer: string }[] = [
-      {
-        game: 'Mobile Legends',
-        prod: 'Mobile Legends - Top Up 296 Diamonds',
-        price: 79500,
-        income: 76000,
-        req: { player_id: '99812734', zone_id: '2104' },
-        buyer: 'Budi_Santoso',
-      },
-      {
-        game: 'Roblox',
-        prod: 'Roblox - Robux 1.000 (Gamepass 5 Hari)',
-        price: 145000,
-        income: 139000,
-        req: { username: 'kevin_robloxian' },
-        buyer: 'Kevin_Gamer',
-      },
-      {
-        game: 'Growtopia',
-        prod: 'Growtopia - 100 World Lock',
-        price: 56000,
-        income: 53500,
-        req: { player_id: 'RayStore', zone_id: 'WORLD_TRADE_99' },
-        buyer: 'Ray_GT',
-      },
-    ];
-
-    const pick = sampleVariants[Math.floor(Math.random() * sampleVariants.length)];
-
-    const newOrder: TokokuOrder = {
-      order_id: orderId,
-      order_number: orderNumber,
-      product_id: 11029,
-      price: pick.price,
-      quantity: 1,
-      order_income: pick.income,
-      game_name: pick.game,
-      product_name: pick.prod,
-      status: 'REQUIRE_PROCESS',
-      required_information: pick.req,
-      using_delivery_info: false,
-      delivery_info_field: null,
-      order_created_at: new Date().toISOString(),
-      country: 'ID',
-      buyer_name: pick.buyer,
-    };
-
-    setOrders(prev => [newOrder, ...prev]);
-
-    // Play instant order sound
-    if (config.alerts.soundEnabled) {
-      playOrderSound(config.alerts.soundVolume);
-    }
-
-    // Trigger desktop notification
-    if (config.alerts.desktopNotification) {
-      triggerDesktopNotification(
-        `🛒 Pesanan Baru: ${pick.prod}`,
-        `No: ${orderNumber} | Pembeli: ${pick.buyer} | Total: Rp ${pick.price.toLocaleString('id-ID')}`
-      );
-    }
-
-    // Dispatch real Telegram & WhatsApp
-    const alertMsg = `🛒 <b>[PESANAN BARU TOKOKU]</b> ⚡\n━━━━━━━━━━━━━━━━━━━━\n<b>Order ID:</b> <code>${orderNumber}</code>\n<b>Produk:</b> ${pick.prod}\n<b>Pembeli:</b> ${pick.buyer}\n<b>Total:</b> Rp ${pick.price.toLocaleString('id-ID')}\n<b>Waktu:</b> ${new Date().toLocaleTimeString('id-ID')} WIB\n━━━━━━━━━━━━━━━━━━━━\n<i>Segera proses pesanan di dashboard Tokoku API!</i>`;
-    sendTelegramAlert(alertMsg);
-
-    const waMsg = `*🛒 [PESANAN BARU TOKOKU] ⚡*\n━━━━━━━━━━━━━━━━━━━━\n*Order ID:* ${orderNumber}\n*Produk:* ${pick.prod}\n*Pembeli:* ${pick.buyer}\n*Total:* Rp ${pick.price.toLocaleString('id-ID')}\n━━━━━━━━━━━━━━━━━━━━\n_Segera kirim pesanan di dashboard!_`;
-    sendWhatsAppAlert(waMsg);
-  };
-
   // Chat message send
   const handleSendMessage = (chatId: string, text: string) => {
     setChats(prev => prev.map(c => {
@@ -370,17 +297,10 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-800 text-[11px] text-emerald-400 font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-800 text-xs text-emerald-400 font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               Webhook Ready
             </div>
-
-            <button
-              onClick={handleSimulateOrder}
-              className="px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white font-semibold text-xs transition shadow-sm"
-            >
-              + Simulasi Order
-            </button>
           </div>
         </header>
 
@@ -391,7 +311,7 @@ export default function App() {
               orders={orders}
               onDeliverOrder={handleDeliverOrder}
               onRejectOrder={handleRejectOrder}
-              onSimulateOrder={handleSimulateOrder}
+              onClearOrders={() => setOrders([])}
             />
           )}
 

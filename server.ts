@@ -300,26 +300,15 @@ app.post('/api/webhook', async (req, res) => {
 // 6. Endpoint: Vercel Files Manifest
 app.get('/api/vercel-files', (req, res) => {
   const vercelJson = {
-    version: 2,
-    buildCommand: "npm run build",
-    outputDirectory: "dist",
-    crons: [
+    installCommand: "npm install --legacy-peer-deps",
+    rewrites: [
       {
-        path: "/api/cron-itemku",
-        schedule: "* * * * *"
-      }
-    ],
-    routes: [
-      {
-        src: "/api/(.*)",
-        dest: "/api/$1"
+        source: "/api/(.*)",
+        destination: "/api/$1"
       },
       {
-        handle: "filesystem"
-      },
-      {
-        src: "/(.*)",
-        dest: "/index.html"
+        source: "/(.*)",
+        destination: "/index.html"
       }
     ]
   };
