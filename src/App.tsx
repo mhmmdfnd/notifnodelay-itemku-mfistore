@@ -245,22 +245,59 @@ export default function App() {
   };
 
   // Test API calls
+  // Test API Telegram langsung dari browser (Instant 0.2 detik, anti muter-muter)
   const handleTestTelegram = async (botToken: string, chatId: string, message?: string) => {
-    const res = await fetch('/api/test-telegram', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ botToken, chatId, message, parseMode: 'HTML' }),
-    });
-    return res.json();
-  };
+    const cleanToken = botToken?.trim() || '';
+    const cleanChatId = chatId?.trim() || '';
 
-  const handleTestWhatsApp = async (provider: any, token: string, targetPhone: string, message?: string) => {
-    const res = await fetch('/api/test-whatsapp', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ provider, token, targetPhone, message }),
-    });
-    return res.json();
+    if (!cleanToken || !cleanChatId) {
+      return {
+        success: false,
+        message: 'Bot Token dan Chat ID wajib diisi!',
+        tip: 'Salin token dari @BotFather dan ID dari @userinfobot.',
+      };
+    }
+
+    const payloadText = message || '🔔 <b>[Tokoku InstantNotify]</b> Tes Notifikasi Berhasil!\nSistem notifikasi instan Tokoku Itemku siap beroperasi di domain web-notif-itemku-mfistore.my.id.';
+
+    try {
+      const response = await fetch(`https://api.telegram.org/bot${cleanToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: cleanChatId,
+          text: payloadText,
+          parse_mode: 'HTML',
+          disable_web_page_preview: true,
+        }),
+      });
+
+      const data = await response.json() as { ok: boolean; description?: string };
+      if (data.ok) {
+        return {
+          success: true,
+          message: '✓ Berhasil! Pesan notifikasi langsung masuk ke Telegram Anda.',
+        };
+      }
+
+      let humanTip = 'Periksa token dan ID Anda.';
+      if (data.description?.includes('Unauthorized')) {
+        humanTip = 'Token bot tidak valid atau bot telah dihapus di @BotFather.';
+      } else if (data.description?.includes('chat not found')) {
+        humanTip = 'Chat tidak ditemukan! Pastikan Anda sudah membuka bot di Telegram dan klik tombol /start.';
+      }
+      return {
+        success: false,
+        message: data.description || 'Gagal mengirim ke Telegram',
+        tip: humanTip,
+      };
+    } catch (err: any) {
+      return {
+        success: false,
+        message: 'Gagal menghubungi Telegram API',
+        tip: 'Periksa koneksi internet atau klik /start di bot Anda.',
+      };
+    }
   };
 
   const requireProcessCount = orders.filter(o => o.status === 'REQUIRE_PROCESS').length;
