@@ -1,0 +1,6 @@
+{
+  "name": "Itemku InstantNotify Pro - Notifikasi Realtime Pesanan, Chat & Kendala Itemku",
+  "description": "Website sistem notifikasi instan tanpa delay untuk penjual Itemku ke WhatsApp & Telegram mencakup pesanan baru, chat pembeli, dan kendala pesanan siap deploy di Vercel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
