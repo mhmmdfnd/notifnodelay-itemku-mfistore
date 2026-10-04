@@ -115,7 +115,7 @@ export const ProfitAnalysisTab: React.FC<ProfitAnalysisTabProps> = ({ orders }) 
         <div className="p-5 rounded-2xl bg-[#0e1626] border border-slate-800 space-y-1">
           <span className="text-[11px] font-bold uppercase text-slate-400">Fee Itemku &amp; Escrow</span>
           <div className="text-2xl font-extrabold text-amber-400">
-            {formatRupiah(totalItemkuFee > 0 ? totalItemkuFee : 54000)}
+            {formatRupiah(totalItemkuFee > 0 ? totalItemkuFee : 0)}
           </div>
           <p className="text-[11px] text-slate-400">
             Biaya layanan escrow penjual
